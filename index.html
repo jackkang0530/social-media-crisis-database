@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Crisis Database</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        /* Main Navigation */
+        .main-nav {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .main-nav-tabs {
+            display: flex;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .main-nav-tab {
+            flex: 1;
+            padding: 20px;
+            background: #ecf0f1;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.3s;
+            border: none;
+            font-size: 16px;
+        }
+
+        .main-nav-tab:hover {
+            background: #d5dbdb;
+        }
+
+        .main-nav-tab.active {
+            background: #3498db;
+            color: white;
+        }
+
+        /* Sub Navigation for Dataset 1 */
+        .sub-nav {
+            display: none;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .sub-nav.active {
+            display: block;
+        }
+
+        .sub-nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .sub-nav-tab {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #7f8c8d;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .sub-nav-tab:hover {
+            border-color: #3498db;
+            color: #3498db;
+        }
+
+        .sub-nav-tab.active {
+            background: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 200px 150px;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .filter-select {
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .results-info {
+            background: #ecf0f1;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 70vh;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            background: #34495e;
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            cursor: pointer;
+            user-select: none;
+            border-right: 1px solid #2c3e50;
+        }
+
+        th:hover {
+            background: #2c3e50;
+        }
+
+        th.sortable::after {
+            content: " ↕";
+            opacity: 0.5;
+            font-size: 12px;
+        }
+
+        th.sort-asc::after {
+            content: " ↑";
+            opacity: 1;
+            color: #3498db;
+        }
+
+        th.sort-desc::after {
+            content: " ↓";
+            opacity: 1;
+            color: #3498db;
+        }
+
+        .filter-button {
+            display: inline-block;
+            margin-left: 8px;
+            cursor: pointer;
+            color: #bdc3c7;
+            font-size: 12px;
+            transition: color 0.2s;
+        }
+
+        .filter-button:hover {
+            color: #3498db;
+        }
+
+        .filter-button.active {
+            color: #e74c3c;
+        }
+
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #ecf0f1;
+            border-right: 1px solid #ecf0f1;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fdfdfd;
+        }
+
+        tr:nth-child(even):hover {
+            background-color: #f8f9fa;
+        }
+
+        .link-cell {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .link-cell:hover {
+            text-decoration: underline;
+        }
+
+        .pagination {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 2px solid #e1e8ed;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #f8f9fa;
+            border-color: #3498db;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination .current-page {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+
+        /* Filter Dropdown Styles */
+        #filter-dropdowns {
+            position: relative;
+            z-index: 0;
+        }
+
+        .filter-dropdown {
+            position: fixed;
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 6px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 9999;
+            min-width: 250px;
+            max-width: 400px;
+            max-height: 300px;
+            display: none;
+        }
+
+        .filter-dropdown.show {
+            display: block;
+        }
+
+        .filter-search {
+            padding: 10px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .filter-search input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e1e8ed;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .filter-options {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 5px 0;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.2s;
+            min-height: 32px;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .filter-option:hover {
+            background-color: #f8f9fa;
+        }
+
+        .filter-option input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .filter-option-text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #2c3e50;
+            font-weight: 400;
+            line-height: 1.4;
+        }
+
+        .filter-option-count {
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-left: 8px;
+            flex-shrink: 0;
+            font-weight: 500;
+        }
+
+        .filter-actions {
+            padding: 10px;
+            border-top: 1px solid #ecf0f1;
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-actions button {
+            padding: 6px 12px;
+            border: 1px solid #e1e8ed;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            background: white;
+        }
+
+        .filter-actions .apply-btn {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .filter-actions .clear-btn {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px 6px;
+                max-width: 150px;
+            }
+
+            .sub-nav-tabs {
+                justify-content: center;
+            }
+
+            .main-nav-tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Social Media Crisis Database</h1>
+            <p>Comprehensive database of social media crisis events and related articles</p>
+        </div>
+
+        <!-- Main Navigation -->
+        <div class="main-nav">
+            <div class="main-nav-tabs">
+                <button class="main-nav-tab active" data-dataset="1">
+                    📋 Dataset 1: Coded Events
+                </button>
+                <button class="main-nav-tab" data-dataset="2">
+                    📰 Dataset 2: Article Information
+                </button>
+            </div>
+            
+            <!-- Sub Navigation for Dataset 1 -->
+            <div class="sub-nav active" id="sub-nav-1">
+                <div class="sub-nav-tabs">
+                    <button class="sub-nav-tab active" data-category="deceptive">
+                        Deceptive & Fraudulent Behavior
+                    </button>
+                    <button class="sub-nav-tab" data-category="offensive">
+                        Offensive & Objectionable Content
+                    </button>
+                    <button class="sub-nav-tab" data-category="safety">
+                        User Safety
+                    </button>
+                    <button class="sub-nav-tab" data-category="regulated">
+                        Regulated Goods & Services
+                    </button>
+                    <button class="sub-nav-tab" data-category="scaled">
+                        Scaled Abuse
+                    </button>
+                    <button class="sub-nav-tab" data-category="violent">
+                        Violent & Criminal Behavior
+                    </button>
+                    <button class="sub-nav-tab" data-category="community">
+                        Community Specific Rules
+                    </button>
+                    <button class="sub-nav-tab" data-category="crisis">
+                        Relevant to Crisis
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by keyword...">
+            </div>
+            <select id="categoryFilter" class="filter-select">
+                <option value="">All Categories</option>
+            </select>
+            <div class="results-info" id="resultsInfo">
+                Loading data...
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-wrapper">
+                <table id="dataTable">
+                    <thead id="tableHeader">
+                        <!-- Headers will be dynamically generated -->
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="11" class="loading">📊 Loading database...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="pagination" id="pagination">
+                <button id="firstPage">First</button>
+                <button id="prevPage">Previous</button>
+                <span id="pageInfo">1 / 1</span>
+                <button id="nextPage">Next</button>
+                <button id="lastPage">Last</button>
+            </div>
+        </div>
+
+        <!-- Filter Dropdowns -->
+        <div id="filter-dropdowns">
+            <!-- Dynamically generated filter dropdowns -->
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentDataset = '1';
+        let currentCategory = 'deceptive';
+        let currentData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        const itemsPerPage = 50;
+        let sortColumn = -1;
+        let sortDirection = 'asc';
+        
+        // Column filters state
+        const columnFilters = {};
+        
+        // Dataset configurations
+        const datasetConfigs = {
+            '1': {
+                name: 'Coded Events',
+                categories: {
+                    deceptive: { 
+                        file: 'dataset1_deceptive.csv', 
+                        name: 'Deceptive & Fraudulent Behavior' 
+                    },
+                    offensive: { 
+                        file: 'dataset1_offensive.csv', 
+                        name: 'Offensive & Objectionable Content' 
+                    },
+                    safety: { 
+                        file: 'dataset1_safety.csv', 
+                        name: 'User Safety' 
+                    },
+                    regulated: { 
+                        file: 'dataset1_regulated.csv', 
+                        name: 'Regulated Goods & Services' 
+                    },
+                    scaled: { 
+                        file: 'dataset1_scaled.csv', 
+                        name: 'Scaled Abuse' 
+                    },
+                    violent: { 
+                        file: 'dataset1_violent.csv', 
+                        name: 'Violent & Criminal Behavior' 
+                    },
+                    community: { 
+                        file: 'dataset1_community.csv', 
+                        name: 'Community Specific Rules' 
+                    },
+                    crisis: { 
+                        file: 'dataset1_crisis.csv', 
+                        name: 'Relevant to Crisis' 
+                    }
+                },
+                columns: [
+                    "Event Num", "Event Title", "Article Set", "Selected Article", 
+                    "Stakeholder", "Giver", "Receiver", "Problematic Behavior", 
+                    "Aftermath", "Platform", "Link"
+                ],
+                filterColumns: {
+                    stakeholder: 4,
+                    giver: 5,
+                    receiver: 6,
+                    behavior: 7,
+                    platform: 9
+                }
+            },
+            '2': {
+                name: 'Article Information',
+                file: 'dataset2_articles.csv',
+                columns: [
+                    "Number", "Title", "Publication Title", "Date", 
+                    "Predicted Code", "Additional Entries"
+                ],
+                filterColumns: {
+                    publication: 2,
+                    predicted_code: 4
+                }
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            loadCurrentData();
+        });
+
+        function setupEventListeners() {
+            // Main navigation
+            document.querySelectorAll('.main-nav-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const dataset = e.target.dataset.dataset;
+                    switchDataset(dataset);
+                });
+            });
+
+            // Sub navigation (Dataset 1 categories)
+            document.querySelectorAll('.sub-nav-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const category = e.target.dataset.category;
+                    switchCategory(category);
+                });
+            });
+
+            // Search and filters
+            document.getElementById('searchInput').addEventListener('input', handleSearch);
+            document.getElementById('categoryFilter').addEventListener('change', handleFilter);
+            
+            // Pagination
+            document.getElementById('firstPage').addEventListener('click', () => goToPage(1));
+            document.getElementById('prevPage').addEventListener('click', () => goToPage(currentPage - 1));
+            document.getElementById('nextPage').addEventListener('click', () => goToPage(currentPage + 1));
+            document.getElementById('lastPage').addEventListener('click', () => goToPage(Math.ceil(filteredData.length / itemsPerPage)));
+            
+            // Outside click to close dropdowns
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.filter-button') && !e.target.closest('.filter-dropdown')) {
+                    document.querySelectorAll('.filter-dropdown').forEach(dropdown => {
+                        dropdown.classList.remove('show');
+                    });
+                }
+            });
+        }
+
+        function switchDataset(dataset) {
+            if (currentDataset === dataset) return;
+            
+            currentDataset = dataset;
+            
+            // Update main nav tabs
+            document.querySelectorAll('.main-nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.dataset === dataset) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Show/hide sub navigation
+            document.querySelectorAll('.sub-nav').forEach(nav => {
+                nav.classList.remove('active');
+            });
+            
+            if (dataset === '1') {
+                document.getElementById('sub-nav-1').classList.add('active');
+                currentCategory = 'deceptive'; // Reset to first category
+                updateSubNavActive();
+            } else {
+                currentCategory = null;
+            }
+            
+            // Reset filters and load data
+            resetFilters();
+            loadCurrentData();
+        }
+
+        function switchCategory(category) {
+            if (currentCategory === category) return;
+            
+            currentCategory = category;
+            updateSubNavActive();
+            resetFilters();
+            loadCurrentData();
+        }
+
+        function updateSubNavActive() {
+            document.querySelectorAll('.sub-nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.category === currentCategory) {
+                    tab.classList.add('active');
+                }
+            });
+        }
+
+        async function loadCurrentData() {
+            try {
+                showLoadingState();
+                
+                let csvFile;
+                if (currentDataset === '1') {
+                    csvFile = datasetConfigs['1'].categories[currentCategory].file;
+                } else {
+                    csvFile = datasetConfigs['2'].file;
+                }
+                
+                console.log(`Loading file: ${csvFile}`);
+                
+                const response = await fetch(csvFile);
+                if (!response.ok) {
+                    throw new Error(`Failed to load ${csvFile}: ${response.status} ${response.statusText}`);
+                }
+                
+                const csvText = await response.text();
+                console.log(`CSV loaded, size: ${csvText.length} characters`);
+                
+                const parsedData = await parseCSVData(csvText);
+                console.log(`Parsed ${parsedData.length} records`);
+                
+                if (parsedData.length > 0) {
+                    currentData = parsedData;
+                } else {
+                    throw new Error('No data parsed from CSV file');
+                }
+                
+            } catch (error) {
+                console.error('Data loading failed:', error);
+                showErrorState(error.message);
+                currentData = [];
+            } finally {
+                setupTableHeaders();
+                setupColumnFilters();
+                loadData();
+                hideLoadingState();
+            }
+        }
+
+        function setupTableHeaders() {
+            const config = datasetConfigs[currentDataset];
+            const thead = document.getElementById('tableHeader');
+            
+            const headers = config.columns.map((column, index) => {
+                const isFilterColumn = Object.values(config.filterColumns || {}).includes(index);
+                
+                if (isFilterColumn) {
+                    const filterKey = Object.keys(config.filterColumns).find(key => 
+                        config.filterColumns[key] === index
+                    );
+                    return `
+                        <th class="sortable" data-column="${index}">
+                            ${column}
+                            <span class="filter-button" data-filter="${filterKey}">🔽</span>
+                        </th>
+                    `;
+                } else {
+                    return `<th class="sortable" data-column="${index}">${column}</th>`;
+                }
+            }).join('');
+            
+            thead.innerHTML = `<tr>${headers}</tr>`;
+            
+            // Setup sorting
+            document.querySelectorAll('th.sortable').forEach(th => {
+                th.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('filter-button')) {
+                        e.stopPropagation();
+                        return;
+                    }
+                    handleSort(parseInt(th.dataset.column));
+                });
+            });
+        }
+
+        function setupColumnFilters() {
+            const config = datasetConfigs[currentDataset];
+            if (!config.filterColumns) return;
+            
+            // Clear existing filters
+            const filterContainer = document.getElementById('filter-dropdowns');
+            filterContainer.innerHTML = '';
+            
+            // Reset column filters state
+            Object.keys(config.filterColumns).forEach(filterName => {
+                columnFilters[filterName] = new Set();
+            });
+            
+            // Create filter dropdowns
+            Object.keys(config.filterColumns).forEach(filterName => {
+                const dropdown = document.createElement('div');
+                dropdown.className = 'filter-dropdown';
+                dropdown.id = `filter-${filterName}`;
+                dropdown.innerHTML = `
+                    <div class="filter-search">
+                        <input type="text" placeholder="Search..." class="filter-search-input">
+                    </div>
+                    <div class="filter-options"></div>
+                    <div class="filter-actions">
+                        <button class="apply-btn">Apply</button>
+                        <button class="clear-btn">Select All</button>
+                    </div>
+                `;
+                filterContainer.appendChild(dropdown);
+            });
+            
+            // Setup filter event listeners
+            setTimeout(() => {
+                initializeColumnFilters();
+                setupFilterEventListeners();
+            }, 100);
+        }
+
+        function setupFilterEventListeners() {
+            const config = datasetConfigs[currentDataset];
+            if (!config.filterColumns) return;
+            
+            Object.keys(config.filterColumns).forEach(filterName => {
+                const filterButton = document.querySelector(`[data-filter="${filterName}"]`);
+                const dropdown = document.getElementById(`filter-${filterName}`);
+                
+                if (!filterButton || !dropdown) return;
+                
+                filterButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    
+                    // Close other dropdowns
+                    document.querySelectorAll('.filter-dropdown').forEach(dd => {
+                        if (dd !== dropdown) dd.classList.remove('show');
+                    });
+                    
+                    // Toggle current dropdown
+                    dropdown.classList.toggle('show');
+                    
+                    if (dropdown.classList.contains('show')) {
+                        updateFilterDropdownData(filterName);
+                        positionFixedDropdown(filterButton, dropdown);
+                    }
+                });
+                
+                // Filter search
+                const searchInput = dropdown.querySelector('.filter-search-input');
+                if (searchInput) {
+                    searchInput.addEventListener('input', () => {
+                        filterDropdownOptions(filterName, searchInput.value);
+                    });
+                }
+                
+                // Apply button
+                const applyBtn = dropdown.querySelector('.apply-btn');
+                if (applyBtn) {
+                    applyBtn.addEventListener('click', () => {
+                        applyColumnFilter(filterName);
+                        dropdown.classList.remove('show');
+                    });
+                }
+                
+                // Select All button
+                const clearBtn = dropdown.querySelector('.clear-btn');
+                if (clearBtn) {
+                    clearBtn.addEventListener('click', () => {
+                        clearColumnFilter(filterName);
+                    });
+                }
+            });
+        }
+
+        function initializeColumnFilters() {
+            const config = datasetConfigs[currentDataset];
+            if (!config.filterColumns) return;
+            
+            Object.keys(config.filterColumns).forEach(filterName => {
+                const columnIndex = config.filterColumns[filterName];
+                const uniqueValues = [...new Set(currentData.map(row => row[columnIndex]).filter(val => val && val.trim()))];
+                console.log(`${filterName} unique values:`, uniqueValues);
+                
+                const dropdown = document.getElementById(`filter-${filterName}`);
+                if (dropdown) {
+                    updateFilterDropdown(filterName, uniqueValues);
+                }
+            });
+        }
+
+        function updateFilterDropdown(filterName, values) {
+            const dropdown = document.getElementById(`filter-${filterName}`);
+            if (!dropdown) return;
+            
+            const optionsContainer = dropdown.querySelector('.filter-options');
+            if (!optionsContainer) return;
+            
+            values.sort();
+            
+            const config = datasetConfigs[currentDataset];
+            const columnIndex = config.filterColumns[filterName];
+            
+            const optionsHTML = values.map(value => {
+                const escapedValue = value.replace(/"/g, '&quot;');
+                const count = currentData.filter(row => row[columnIndex] === value).length;
+                const isChecked = columnFilters[filterName].size === 0 || columnFilters[filterName].has(value);
+                
+                return `
+                    <div class="filter-option" data-value="${escapedValue}">
+                        <input type="checkbox" ${isChecked ? 'checked' : ''} />
+                        <span class="filter-option-text">${value}</span>
+                        <span class="filter-option-count">(${count})</span>
+                    </div>
+                `;
+            }).join('');
+            
+            optionsContainer.innerHTML = optionsHTML;
+            
+            // Add event listeners
+            optionsContainer.querySelectorAll('.filter-option').forEach(option => {
+                const checkbox = option.querySelector('input[type="checkbox"]');
+                if (checkbox) {
+                    checkbox.addEventListener('change', () => {
+                        updateFilterButtonState(filterName);
+                    });
+                }
+                
+                option.addEventListener('click', (e) => {
+                    if (e.target.type !== 'checkbox' && checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        updateFilterButtonState(filterName);
+                    }
+                });
+            });
+        }
+
+        function updateFilterDropdownData(filterName) {
+            const config = datasetConfigs[currentDataset];
+            const columnIndex = config.filterColumns[filterName];
+            const currentFilteredData = getFilteredDataExcluding(filterName);
+            const uniqueValues = [...new Set(currentFilteredData.map(row => row[columnIndex]).filter(val => val && val.trim()))];
+            
+            const dropdown = document.getElementById(`filter-${filterName}`);
+            const optionsContainer = dropdown.querySelector('.filter-options');
+            
+            uniqueValues.sort();
+            
+            optionsContainer.innerHTML = uniqueValues.map(value => {
+                const count = currentFilteredData.filter(row => row[columnIndex] === value).length;
+                const isChecked = columnFilters[filterName].size === 0 || columnFilters[filterName].has(value);
+                
+                return `
+                    <div class="filter-option" data-value="${value}">
+                        <input type="checkbox" ${isChecked ? 'checked' : ''} />
+                        <span class="filter-option-text">${value}</span>
+                        <span class="filter-option-count">(${count})</span>
+                    </div>
+                `;
+            }).join('');
+            
+            // Re-add event listeners
+            optionsContainer.querySelectorAll('.filter-option').forEach(option => {
+                const checkbox = option.querySelector('input[type="checkbox"]');
+                if (checkbox) {
+                    checkbox.addEventListener('change', () => {
+                        updateFilterButtonState(filterName);
+                    });
+                }
+                
+                option.addEventListener('click', (e) => {
+                    if (e.target.type !== 'checkbox' && checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        updateFilterButtonState(filterName);
+                    }
+                });
+            });
+        }
+
+        function updateFilterButtonState(filterName) {
+            const filterButton = document.querySelector(`[data-filter="${filterName}"]`);
+            const dropdown = document.getElementById(`filter-${filterName}`);
+            const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
+            const checkedBoxes = dropdown.querySelectorAll('input[type="checkbox"]:checked');
+            
+            if (checkedBoxes.length === 0 || checkedBoxes.length === checkboxes.length) {
+                filterButton.classList.remove('active');
+            } else {
+                filterButton.classList.add('active');
+            }
+        }
+
+        function applyColumnFilter(filterName) {
+            const dropdown = document.getElementById(`filter-${filterName}`);
+            const checkedOptions = dropdown.querySelectorAll('input[type="checkbox"]:checked');
+            
+            columnFilters[filterName].clear();
+            checkedOptions.forEach(checkbox => {
+                const value = checkbox.closest('.filter-option').dataset.value;
+                columnFilters[filterName].add(value);
+            });
+            
+            applyAllFilters();
+            updateFilterButtonState(filterName);
+        }
+
+        function clearColumnFilter(filterName) {
+            const dropdown = document.getElementById(`filter-${filterName}`);
+            const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            
+            columnFilters[filterName].clear();
+            updateFilterButtonState(filterName);
+        }
+
+        function getFilteredDataExcluding(excludeFilter) {
+            let data = [...currentData];
+            const config = datasetConfigs[currentDataset];
+            
+            // Apply search filter
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (searchTerm) {
+                data = data.filter(row => 
+                    row.some(cell => cell.toString().toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            // Apply category filter
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            if (categoryFilter && config.filterColumns && config.filterColumns.behavior) {
+                data = data.filter(row => row[config.filterColumns.behavior].includes(categoryFilter));
+            }
+            
+            // Apply other column filters (excluding current filter)
+            if (config.filterColumns) {
+                Object.keys(config.filterColumns).forEach(filterName => {
+                    if (filterName !== excludeFilter && columnFilters[filterName] && columnFilters[filterName].size > 0) {
+                        const columnIndex = config.filterColumns[filterName];
+                        data = data.filter(row => columnFilters[filterName].has(row[columnIndex]));
+                    }
+                });
+            }
+            
+            return data;
+        }
+
+        function positionFixedDropdown(button, dropdown) {
+            const buttonRect = button.getBoundingClientRect();
+            dropdown.style.left = buttonRect.left + 'px';
+            dropdown.style.top = (buttonRect.bottom + 2) + 'px';
+        }
+
+        function filterDropdownOptions(filterName, searchTerm) {
+            const dropdown = document.getElementById(`filter-${filterName}`);
+            const options = dropdown.querySelectorAll('.filter-option');
+            
+            options.forEach(option => {
+                const text = option.querySelector('.filter-option-text').textContent.toLowerCase();
+                const isVisible = text.includes(searchTerm.toLowerCase());
+                option.style.display = isVisible ? 'flex' : 'none';
+            });
+        }
+
+        async function parseCSVData(csvText) {
+            if (!csvText || csvText.trim().length === 0) {
+                console.error('CSV text is empty');
+                return [];
+            }
+            
+            const lines = csvText.trim().split('\n');
+            const data = [];
+            
+            console.log(`Total lines: ${lines.length}`);
+            
+            if (lines.length < 2) {
+                console.error('CSV file too short');
+                return [];
+            }
+            
+            const header = parseCSVLine(lines[0]);
+            console.log('Header:', header);
+            
+            const expectedColumns = datasetConfigs[currentDataset].columns;
+            
+            let successCount = 0;
+            let errorCount = 0;
+            
+            for (let i = 1; i < lines.length; i++) {
+                try {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+                    
+                    const row = parseCSVLine(line);
+                    
+                    if (row.length >= expectedColumns.length - 1 && row[0] && row[0].trim()) {
+                        // Fill missing columns with empty strings
+                        while (row.length < expectedColumns.length) {
+                            row.push('');
+                        }
+                        data.push(row);
+                        successCount++;
+                    } else {
+                        errorCount++;
+                        if (errorCount <= 5) {
+                            console.warn(`Line ${i} skipped - columns: ${row.length}, first value: "${row[0]}"`);
+                        }
+                    }
+                } catch (error) {
+                    errorCount++;
+                    if (errorCount <= 5) {
+                        console.warn(`Line ${i} parsing failed:`, error.message);
+                    }
+                }
+                
+                if (i % 5000 === 0) {
+                    console.log(`Parsing progress: ${Math.round((i / lines.length) * 100)}% (success: ${successCount}, errors: ${errorCount})`);
+                    
+                    const resultsInfo = document.getElementById('resultsInfo');
+                    resultsInfo.textContent = `Processing data... ${Math.round((i / lines.length) * 100)}%`;
+                    
+                    await new Promise(resolve => setTimeout(resolve, 1));
+                }
+            }
+            
+            console.log(`Parsing complete - success: ${successCount}, errors: ${errorCount}`);
+            return data;
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            let i = 0;
+            
+            while (i < line.length) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
+                        current += '"';
+                        i += 2;
+                    } else {
+                        inQuotes = !inQuotes;
+                        i++;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                    i++;
+                } else {
+                    current += char;
+                    i++;
+                }
+            }
+            
+            result.push(current.trim());
+            return result;
+        }
+
+        function loadData() {
+            filteredData = [...currentData];
+            renderTable();
+            updatePagination();
+            updateResultsInfo();
+        }
+
+        function handleSearch() {
+            applyAllFilters();
+        }
+
+        function handleFilter() {
+            applyAllFilters();
+        }
+
+        function applyAllFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const config = datasetConfigs[currentDataset];
+            
+            filteredData = currentData.filter(row => {
+                // Search filter
+                const matchesSearch = searchTerm === '' || row.some(cell => 
+                    cell.toString().toLowerCase().includes(searchTerm)
+                );
+                
+                // Category filter
+                const matchesCategory = categoryFilter === '' || 
+                    (config.filterColumns && config.filterColumns.behavior && 
+                     row[config.filterColumns.behavior].includes(categoryFilter));
+                
+                // Column filters
+                const matchesColumnFilters = !config.filterColumns || Object.keys(config.filterColumns).every(filterName => {
+                    if (!columnFilters[filterName] || columnFilters[filterName].size === 0) return true;
+                    const columnIndex = config.filterColumns[filterName];
+                    return columnFilters[filterName].has(row[columnIndex]);
+                });
+                
+                return matchesSearch && matchesCategory && matchesColumnFilters;
+            });
+            
+            currentPage = 1;
+            renderTable();
+            updatePagination();
+            updateResultsInfo();
+        }
+
+        function handleSort(columnIndex) {
+            if (sortColumn === columnIndex) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = columnIndex;
+                sortDirection = 'asc';
+            }
+
+            filteredData.sort((a, b) => {
+                let aVal = a[columnIndex];
+                let bVal = b[columnIndex];
+
+                const aNum = parseFloat(aVal);
+                const bNum = parseFloat(bVal);
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    aVal = aNum;
+                    bVal = bNum;
+                } else {
+                    aVal = aVal.toString().toLowerCase();
+                    bVal = bVal.toString().toLowerCase();
+                }
+
+                if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            updateSortIcons();
+            renderTable();
+        }
+
+        function updateSortIcons() {
+            document.querySelectorAll('th.sortable').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+                if (parseInt(th.dataset.column) === sortColumn) {
+                    th.classList.add(sortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+                }
+            });
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageData = filteredData.slice(startIndex, endIndex);
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 40px; color: #7f8c8d;">No results found.</td></tr>';
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+            
+            pageData.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = row.map((cell, index) => {
+                    // Check if this is a link column (last column for dataset 1, or contains URL)
+                    const isLinkColumn = (currentDataset === '1' && index === row.length - 1) || 
+                                       (cell && cell.startsWith('http'));
+                    
+                    if (isLinkColumn && cell && cell.startsWith('http')) {
+                        return `<td><a href="${cell}" target="_blank" rel="noopener noreferrer" class="link-cell">${cell}</a></td>`;
+                    }
+                    
+                    const cellContent = cell || '';
+                    const displayContent = cellContent.length > 50 ? cellContent.substring(0, 50) + '...' : cellContent;
+                    return `<td title="${cellContent}">${displayContent}</td>`;
+                }).join('');
+                fragment.appendChild(tr);
+            });
+            
+            tbody.innerHTML = '';
+            tbody.appendChild(fragment);
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            
+            document.getElementById('firstPage').disabled = currentPage === 1;
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
+            document.getElementById('lastPage').disabled = currentPage === totalPages || totalPages === 0;
+            
+            document.getElementById('pageInfo').textContent = `${currentPage} / ${Math.max(1, totalPages)}`;
+        }
+
+        function updateResultsInfo() {
+            const total = filteredData.length;
+            const start = Math.min((currentPage - 1) * itemsPerPage + 1, total);
+            const end = Math.min(currentPage * itemsPerPage, total);
+            
+            if (total === 0) {
+                document.getElementById('resultsInfo').textContent = 'No results found';
+            } else {
+                document.getElementById('resultsInfo').textContent = `${start}-${end} / ${total.toLocaleString()} entries`;
+            }
+        }
+
+        function goToPage(page) {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderTable();
+                updatePagination();
+                updateResultsInfo();
+            }
+        }
+
+        function showLoadingState() {
+            const resultsInfo = document.getElementById('resultsInfo');
+            resultsInfo.textContent = 'Loading data...';
+            resultsInfo.style.background = '#3498db';
+            resultsInfo.style.color = 'white';
+            
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '<tr><td colspan="11" class="loading">📊 Loading database...<br><small>Please wait while we process the data.</small></td></tr>';
+        }
+
+        function hideLoadingState() {
+            const resultsInfo = document.getElementById('resultsInfo');
+            resultsInfo.style.background = '#ecf0f1';
+            resultsInfo.style.color = '#7f8c8d';
+        }
+
+        function showErrorState(message) {
+            const resultsInfo = document.getElementById('resultsInfo');
+            resultsInfo.textContent = 'Error loading data';
+            resultsInfo.style.background = '#e74c3c';
+            resultsInfo.style.color = 'white';
+            
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; padding: 40px; color: #e74c3c;">❌ ${message}<br><small>Please check the CSV files are properly uploaded.</small></td></tr>`;
+        }
+
+        function resetFilters() {
+            // Reset search
+            document.getElementById('searchInput').value = '';
+            
+            // Reset category filter
+            document.getElementById('categoryFilter').value = '';
+            
+            // Reset column filters
+            Object.keys(columnFilters).forEach(filterName => {
+                columnFilters[filterName].clear();
+            });
+            
+            // Reset page
+            currentPage = 1;
+            sortColumn = -1;
+            sortDirection = 'asc';
+        }
+    </script>
+</body>
+</html>
